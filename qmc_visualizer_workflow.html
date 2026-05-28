@@ -1,0 +1,223 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .root { padding: 1.5rem 0; }
+
+  .doc-title { font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .doc-sub { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 2rem; }
+
+  .phase { margin-bottom: 2rem; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+  .phase-header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .phase-badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .p1 .phase-badge { background: #EEEDFE; color: #3C3489; }
+  .p2 .phase-badge { background: #E1F5EE; color: #085041; }
+  .p3 .phase-badge { background: #FAEEDA; color: #633806; }
+  .phase-title { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+  .phase-desc { margin-left: auto; font-size: 13px; color: var(--color-text-secondary); font-style: italic; }
+
+  .phase-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; background: var(--color-background-primary); }
+
+  .step { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); }
+  .step-num { font-size: 12px; font-weight: 500; min-width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .p1 .step-num { background: #EEEDFE; color: #534AB7; }
+  .p2 .step-num { background: #E1F5EE; color: #0F6E56; }
+  .p3 .step-num { background: #FAEEDA; color: #854F0B; }
+
+  .step-content { flex: 1; }
+  .step-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .step-detail { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+
+  .code-inline { font-family: var(--font-mono); font-size: 12px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: 4px; padding: 1px 6px; color: var(--color-text-primary); }
+
+  .warn-box { margin-top: 8px; padding: 8px 12px; border-left: 2px solid #EF9F27; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; background: #FAEEDA22; font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+  .warn-label { font-weight: 500; color: #854F0B; margin-right: 4px; }
+
+  .tip-box { margin-top: 8px; padding: 8px 12px; border-left: 2px solid #1D9E75; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; background: #E1F5EE22; font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+  .tip-label { font-weight: 500; color: #0F6E56; margin-right: 4px; }
+
+  .priority-section { margin-top: 2rem; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; }
+  .priority-header { padding: 14px 20px; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+  .priority-body { padding: 12px 20px; display: flex; flex-direction: column; gap: 6px; background: var(--color-background-primary); }
+  .prow { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); }
+  .pdot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .red-dot { background: #E24B4A; }
+  .yellow-dot { background: #EF9F27; }
+  .green-dot { background: #639922; }
+  .ptext { font-size: 13px; color: var(--color-text-primary); flex: 1; }
+  .ptag { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+  .tag-must { background: #FCEBEB; color: #A32D2D; }
+  .tag-should { background: #FAEEDA; color: #854F0B; }
+  .tag-nice { background: #EAF3DE; color: #3B6D11; }
+
+  .data-struct { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 14px; margin-top: 8px; font-family: var(--font-mono); font-size: 12px; color: var(--color-text-secondary); line-height: 1.8; }
+  .ds-key { color: #534AB7; }
+  .ds-val { color: #0F6E56; }
+  .ds-comment { color: var(--color-text-tertiary); }
+</style>
+
+<div class="root">
+  <h2 class="sr-only">Workflow tổng hợp: Quine-McCluskey Visualizer</h2>
+  <p class="doc-title">QMC Visualizer — Workflow Tổng hợp</p>
+  <p class="doc-sub">Thuần HTML/CSS/JS · Có Don't Care · Nộp bài tập môn Điện tử số</p>
+
+  <div class="phase p1">
+    <div class="phase-header">
+      <span class="phase-badge">Giai đoạn 1</span>
+      <span class="phase-title">Xây dựng "Bộ não" — Core Algorithm</span>
+      <span class="phase-desc">Không chạm vào UI vội, test bằng console trước</span>
+    </div>
+    <div class="phase-body">
+
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-content">
+          <p class="step-name">Parse Input</p>
+          <p class="step-detail">Nhận mảng minterm (VD: <span class="code-inline">[0,1,2,5,6,7]</span>) và mảng don't care riêng biệt (VD: <span class="code-inline">[3,4]</span>). Chuyển cả hai sang chuỗi nhị phân với số bit cố định (tự tính từ max minterm).</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-content">
+          <p class="step-name">Group by 1s — Nhóm theo số bit 1</p>
+          <p class="step-detail">Đếm số bit '1' trong mỗi chuỗi nhị phân, xếp vào các nhóm (Group 0, 1, 2...). Don't care <span style="font-weight:500">tham gia nhóm bình thường</span> ở bước này.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-content">
+          <p class="step-name">Merge — Rút gọn lặp & lưu "vết"</p>
+          <p class="step-detail">So sánh Group i và Group i+1. Nếu khác đúng 1 bit → tạo implicant mới (bit khác → <span class="code-inline">-</span>). Lưu đủ 3 trường cho mỗi implicant:</p>
+          <div class="data-struct">
+            {<br>
+            &nbsp;&nbsp;<span class="ds-key">pattern</span>: <span class="ds-val">"0-10"</span>,<br>
+            &nbsp;&nbsp;<span class="ds-key">minterms</span>: <span class="ds-val">[2, 6]</span>, &nbsp;<span class="ds-comment">// bắt buộc để vẽ chart</span><br>
+            &nbsp;&nbsp;<span class="ds-key">usedInMerge</span>: <span class="ds-val">false</span> &nbsp;<span class="ds-comment">// false → Prime Implicant</span><br>
+            }
+          </div>
+          <div class="warn-box"><span class="warn-label">⚠ Quan trọng:</span> Thiếu trường <span class="code-inline">minterms</span> thì bước vẽ Prime Implicant Chart sẽ không làm được.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-num">4</span>
+        <div class="step-content">
+          <p class="step-name">Prime Implicant Chart — Lập bảng</p>
+          <p class="step-detail">Ma trận 2 chiều: hàng = Prime Implicants, cột = minterm ban đầu. Don't care <span style="font-weight:500">không có cột</span> trong bảng này — không cần được cover.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-num">5</span>
+        <div class="step-content">
+          <p class="step-name">Essential PI + Petrick's Method</p>
+          <p class="step-detail">Tìm cột chỉ có 1 tick → Essential PI. Sau khi chọn EPI, nếu vẫn còn minterm chưa được cover → áp dụng Petrick (tích các tổng, rút gọn) hoặc thuật toán tham lam. Không có bước này thì một số bài toán sẽ ra kết quả thiếu.</p>
+          <div class="warn-box"><span class="warn-label">⚠ Lưu ý:</span> Đây là bước hay bị bỏ qua nhất. Don't care không xuất hiện trong biểu thức kết quả cuối.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-num">6</span>
+        <div class="step-content">
+          <p class="step-name">Format Output — Biểu thức Boolean</p>
+          <p class="step-detail">Chuyển pattern <span class="code-inline">0-10</span> → biểu thức Boolean <span class="code-inline">A'C</span> dựa vào số biến và vị trí bit (bit 1 = biến thường, bit 0 = biến đảo, dấu <span class="code-inline">-</span> = bỏ qua). Đây là thứ người dùng thực sự muốn thấy.</p>
+          <div class="tip-box"><span class="tip-label">✓ Output Giai đoạn 1:</span> Một object chứa toàn bộ quá trình — groups theo từng vòng, list PI, PI chart, EPI, biểu thức cuối.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="phase p2">
+    <div class="phase-header">
+      <span class="phase-badge">Giai đoạn 2</span>
+      <span class="phase-title">Xây dựng "Giao diện" — UI Integration</span>
+      <span class="phase-desc">Core algorithm đã đúng → mới bắt đầu dựng HTML</span>
+    </div>
+    <div class="phase-body">
+
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-content">
+          <p class="step-name">Trang Input</p>
+          <p class="step-detail">Textbox nhập minterm (cách nhau bằng dấu phẩy), textbox thứ hai cho don't care (để trống nếu không có). Một nút "Tối giản" để trigger xử lý.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-content">
+          <p class="step-name">Hiển thị các vòng rút gọn</p>
+          <p class="step-detail">Render mỗi vòng merge thành một bảng HTML. Dùng <span class="code-inline">forEach</span> hoặc <span class="code-inline">map</span> để loop qua dữ liệu từ Giai đoạn 1. Mỗi cột là một vòng rút gọn, các implicant đã dùng trong merge được gạch chân hoặc mờ đi.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-content">
+          <p class="step-name">Prime Implicant Chart</p>
+          <p class="step-detail">Vẽ bảng chart dưới dạng <span class="code-inline">&lt;table&gt;</span>. Dùng <span class="code-inline">position: sticky</span> cho hàng đầu và cột đầu để khi cuộn ngang vẫn thấy nhãn — quan trọng khi số biến nhiều (5-6 biến → 32+ cột).</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-num">4</span>
+        <div class="step-content">
+          <p class="step-name">Hiển thị kết quả</p>
+          <p class="step-detail">In biểu thức Boolean cuối cùng, highlight các Essential PI, và list các PI được chọn thêm bởi Petrick (nếu có).</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="phase p3">
+    <div class="phase-header">
+      <span class="phase-badge">Giai đoạn 3</span>
+      <span class="phase-title">"Nâng cấp" — Interactivity & Visuals</span>
+      <span class="phase-desc">Biến trang web thành công cụ giáo dục thực thụ</span>
+    </div>
+    <div class="phase-body">
+
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-content">
+          <p class="step-name">Next / Prev Step</p>
+          <p class="step-detail">Ẩn tất cả bảng. Mỗi lần bấm "Next" → hiện thêm một bước. Giúp người xem theo dõi từng bước thuật toán thay vì bị overwhelm bởi tất cả bảng cùng lúc.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-content">
+          <p class="step-name">Highlight tương tác</p>
+          <p class="step-detail">Khi hover vào một Prime Implicant ở kết quả cuối, tô màu các minterm tương ứng trong bảng chart. Khi hover vào implicant trong bảng rút gọn, highlight các minterm nguồn tạo ra nó.</p>
+          <div class="tip-box"><span class="tip-label">✓ Vì sao:</span> Đây chính là phần "trực quan hóa" thực sự — người dùng thấy được kết nối giữa biểu thức cuối và các minterm gốc.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <span class="step-num">3</span>
+        <div class="step-content">
+          <p class="step-name">Karnaugh Map song song — điểm nhấn mạnh nhất</p>
+          <p class="step-detail">Hiển thị K-map bên cạnh kết quả (dùng CSS Grid, hỗ trợ 2-4 biến). Khi chọn một PI ở kết quả, tô màu nhóm ô tương ứng trên K-map. Kết nối hai phương pháp tối giản mà môn học dạy — giám khảo thấy ngay bạn hiểu bản chất.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="priority-section">
+    <div class="priority-header">Thứ tự ưu tiên khi thời gian có hạn</div>
+    <div class="priority-body">
+      <div class="prow"><span class="pdot red-dot"></span><span class="ptext">Core algorithm đúng + trace đủ 3 trường (pattern, minterms, usedInMerge)</span><span class="ptag tag-must">Bắt buộc</span></div>
+      <div class="prow"><span class="pdot red-dot"></span><span class="ptext">Don't care xử lý đúng 2 pha (tham gia merge, không có cột trong chart)</span><span class="ptag tag-must">Bắt buộc</span></div>
+      <div class="prow"><span class="pdot red-dot"></span><span class="ptext">Petrick hoặc greedy cho bài toán không đủ Essential PI</span><span class="ptag tag-must">Bắt buộc</span></div>
+      <div class="prow"><span class="pdot yellow-dot"></span><span class="ptext">Next/Prev step + highlight hover</span><span class="ptag tag-should">Nên có</span></div>
+      <div class="prow"><span class="pdot yellow-dot"></span><span class="ptext">Format biểu thức Boolean đẹp (A'B + BC')</span><span class="ptag tag-should">Nên có</span></div>
+      <div class="prow"><span class="pdot green-dot"></span><span class="ptext">K-map visualization song song với kết quả</span><span class="ptag tag-nice">Nếu còn thời gian</span></div>
+    </div>
+  </div>
+</div>
