@@ -1587,16 +1587,18 @@ const toggleStepperMode = () => {
   stepperMode = !stepperMode;
 
   if (stepperMode) {
-    dom.btnToggleMode.textContent = 'ðŸ“‹ Xem táº¥t cáº£';
+    dom.btnToggleMode.textContent = '📋 Xem tất cả';
     dom.btnToggleMode.classList.add('active');
     dom.stepperControls.classList.remove('hidden');
+    if (dom.codeTracePanel) dom.codeTracePanel.classList.remove('hidden');
 
     currentStep = 0;
     goToStep(0);
   } else {
-    dom.btnToggleMode.textContent = 'ðŸ“– Xem tá»«ng bÆ°á»›c';
+    dom.btnToggleMode.textContent = '📖 Xem từng bước';
     dom.btnToggleMode.classList.remove('active');
     dom.stepperControls.classList.add('hidden');
+    if (dom.codeTracePanel) dom.codeTracePanel.classList.add('hidden');
 
     const allCards = dom.resultsSection.querySelectorAll('.result-card');
     allCards.forEach((card) => {
@@ -1609,8 +1611,6 @@ const toggleStepperMode = () => {
       }
       dom.logicCard.classList.remove('hidden');
     }
-
-    if (typeof updateCodeTrace === 'function') updateCodeTrace(steps.length - 1);
   }
 };
 
@@ -1745,9 +1745,9 @@ const runAlgorithm = () => {
       currentStep = 0;
       goToStep(0);
       renderStepperProgress();
+      if (dom.codeTracePanel) dom.codeTracePanel.classList.remove('hidden');
     } else {
-        if (dom.codeTracePanel) dom.codeTracePanel.classList.remove('hidden');
-        if (typeof updateCodeTrace === 'function') updateCodeTrace(steps.length - 1);
+      if (dom.codeTracePanel) dom.codeTracePanel.classList.add('hidden');
     }
 
     dom.resultsSection.classList.remove('hidden');
@@ -1971,7 +1971,7 @@ const updateCodeTrace = (stepIdx) => {
   });
 
   const targetLines = STEP_LINE_MAP[stepIdx] || [];
-  
+
   for (let i = 0; i < stepIdx; i++) {
     const prevLines = STEP_LINE_MAP[i] || [];
     prevLines.forEach(lNum => {
@@ -1989,14 +1989,14 @@ const updateCodeTrace = (stepIdx) => {
   if (inspector && currentResult) {
     let msg = '';
     switch (stepIdx) {
-      case 0: msg = 'Kh?i t?o: phân tích minterms và don''t cares -> chu?i nh? phân.'; break;
-      case 1: msg = 'Ðang phân chia các implicant thành nhóm theo s? lu?ng bit ''1''.'; break;
-      case 2: msg = 'Th?c hi?n g?p các nhóm lân c?n...'; break;
-      case 3: msg = 'L?p PI Chart ph? các minterms.'; break;
+      case 0: msg = 'Khởi tạo: phân tích minterms và don''t cares -> chuỗi nhị phân.'; break;
+      case 1: msg = 'Đang phân chia các implicant thành nhóm theo số lượng bit ''1''.'; break;
+      case 2: msg = 'Thực hiện gộp các nhóm lân cận...'; break;
+      case 3: msg = 'Lập PI Chart phủ các minterms.'; break;
       case 4: msg = 'Tìm các Essential PIs.'; break;
-      case 5: msg = 'S? d?ng phuong pháp Petrick cho các minterms còn l?i.'; break;
-      case 6: msg = 'T?ng h?p R_min(F) = ' + currentResult.expression; break;
-      default: msg = 'Ðang x? lý...';
+      case 5: msg = 'Sử dụng phuong pháp Petrick cho các minterms còn lại.'; break;
+      case 6: msg = 'Tổng hợp R_min(F) = ' + currentResult.expression; break;
+      default: msg = 'Đang xử lý...';
     }
     inspector.textContent = msg;
   }
