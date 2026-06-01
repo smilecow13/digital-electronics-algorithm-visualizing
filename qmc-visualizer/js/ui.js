@@ -1989,8 +1989,8 @@ const updateCodeTrace = (stepIdx) => {
   if (inspector && currentResult) {
     let msg = '';
     switch (stepIdx) {
-      case 0: msg = 'Khởi tạo: phân tích minterms và don''t cares -> chuỗi nhị phân.'; break;
-      case 1: msg = 'Đang phân chia các implicant thành nhóm theo số lượng bit ''1''.'; break;
+      case 0: msg = "Khởi tạo: phân tích minterms và don't cares -> chuỗi nhị phân."; break;
+      case 1: msg = "Đang phân chia các implicant thành nhóm theo số lượng bit '1'."; break;
       case 2: msg = 'Thực hiện gộp các nhóm lân cận...'; break;
       case 3: msg = 'Lập PI Chart phủ các minterms.'; break;
       case 4: msg = 'Tìm các Essential PIs.'; break;
