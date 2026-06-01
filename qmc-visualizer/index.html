@@ -524,6 +524,30 @@
 
   </div>
 
+  <!-- ============================================================
+       CODE TRACE PANEL (VisuAlgo Style)
+       ============================================================ -->
+  <div class="code-trace-panel hidden" id="code-trace-panel">
+    <div class="state-inspector" id="state-inspector">
+      Chờ chạy thuật toán...
+    </div>
+    <div class="code-block" id="pseudocode-block">
+      <div class="code-line" data-line="1">Parse minterms & don't cares → binary strings</div>
+      <div class="code-line" data-line="2">Group implicants by number of 1-bits</div>
+      <div class="code-line" data-line="3">FOR each round:</div>
+      <div class="code-line indent-1" data-line="4">FOR each adjacent group pair (i, i+1):</div>
+      <div class="code-line indent-2" data-line="5">FOR each pair (impA, impB):</div>
+      <div class="code-line indent-3" data-line="6">IF differ by exactly 1 bit → merge</div>
+      <div class="code-line indent-3" data-line="7">Mark impA, impB as usedInMerge = true</div>
+      <div class="code-line indent-3" data-line="8">Add merged implicant (avoid duplicates)</div>
+      <div class="code-line" data-line="9">Collect unused implicants → Prime Implicants</div>
+      <div class="code-line" data-line="10">Build PI Chart (minterms only, no don't cares)</div>
+      <div class="code-line" data-line="11">Find Essential PIs (columns with single tick)</div>
+      <div class="code-line" data-line="12">Apply Petrick's Method for remaining minterms</div>
+      <div class="code-line" data-line="13">Generate Boolean expression</div>
+    </div>
+  </div>
+
   <script src="js/algorithm.js"></script>
   <script src="js/ui.js"></script>
 </body>

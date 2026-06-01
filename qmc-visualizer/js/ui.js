@@ -1,24 +1,24 @@
 // ============================================================
-// ui.js — Render & Tương tác cao cấp cho QMC Visualizer (HUST Standard)
-// Tách biệt hoàn toàn DOM khỏi thuật toán của algorithm.js.
+// ui.js â€” Render & TÆ°Æ¡ng tÃ¡c cao cáº¥p cho QMC Visualizer (HUST Standard)
+// TÃ¡ch biá»‡t hoÃ n toÃ n DOM khá»i thuáº­t toÃ¡n cá»§a algorithm.js.
 // ============================================================
 
-// ---- Bảng màu Neon cao cấp cho các tích cực tiểu được chọn -------
+// ---- Báº£ng mÃ u Neon cao cáº¥p cho cÃ¡c tÃ­ch cá»±c tiá»ƒu Ä‘Æ°á»£c chá»n -------
 const PI_COLORS = [
-  { r: 2, g: 132, b: 199, label: 'cyan' }, // Xanh dương sáng
-  { r: 124, g: 58, b: 237, label: 'purple' }, // Tím đậm
-  { r: 5, g: 150, b: 105, label: 'emerald' }, // Xanh lục neon
-  { r: 217, g: 119, b: 6, label: 'amber' }, // Vàng cam ấm
-  { r: 220, g: 38, b: 38, label: 'rose' }, // Đỏ hồng neon
-  { r: 219, g: 39, b: 119, label: 'pink' }, // Hồng cánh sen
-  { r: 101, g: 163, b: 13, label: 'lime' }, // Xanh chuối
-  { r: 13, g: 148, b: 136, label: 'teal' }, // Xanh ngọc
+  { r: 2, g: 132, b: 199, label: 'cyan' }, // Xanh dÆ°Æ¡ng sÃ¡ng
+  { r: 124, g: 58, b: 237, label: 'purple' }, // TÃ­m Ä‘áº­m
+  { r: 5, g: 150, b: 105, label: 'emerald' }, // Xanh lá»¥c neon
+  { r: 217, g: 119, b: 6, label: 'amber' }, // VÃ ng cam áº¥m
+  { r: 220, g: 38, b: 38, label: 'rose' }, // Äá» há»“ng neon
+  { r: 219, g: 39, b: 119, label: 'pink' }, // Há»“ng cÃ¡nh sen
+  { r: 101, g: 163, b: 13, label: 'lime' }, // Xanh chuá»‘i
+  { r: 13, g: 148, b: 136, label: 'teal' }, // Xanh ngá»c
 ];
 
 const GRAY_1 = [0, 1];
 const GRAY_2 = [0, 1, 3, 2];
 
-// ---- Khởi tạo tham chiếu DOM ---------------------------------
+// ---- Khá»Ÿi táº¡o tham chiáº¿u DOM ---------------------------------
 const dom = {
   inputMinterms: document.getElementById('input-minterms'),
   inputDontCares: document.getElementById('input-dontcares'),
@@ -72,9 +72,10 @@ const dom = {
   example1: document.getElementById('example-1'),
   example2: document.getElementById('example-2'),
   example3: document.getElementById('example-3'),
+  codeTracePanel: document.getElementById('code-trace-panel'),
 };
 
-// ---- Trạng thái ứng dụng (Application State) -----------------
+// ---- Tráº¡ng thÃ¡i á»©ng dá»¥ng (Application State) -----------------
 let currentResult = null;
 let currentMinterms = [];
 let currentDontCares = [];
@@ -86,12 +87,12 @@ let currentStep = 0;
 let steps = [];
 
 // K-map & Interactive state
-let activeKmapGroup = -1; // -1: hiện tất cả, >=0: highlight một nhóm cố định
+let activeKmapGroup = -1; // -1: hiá»‡n táº¥t cáº£, >=0: highlight má»™t nhÃ³m cá»‘ Ä‘á»‹nh
 
-// ---- THÀNH PHẦN 0: CHUYỂN ĐỔI CHẾ ĐỘ SÁNG / TỐI (THEME TOGGLE) -
+// ---- THÃ€NH PHáº¦N 0: CHUYá»‚N Äá»”I CHáº¾ Äá»˜ SÃNG / Tá»I (THEME TOGGLE) -
 
 /**
- * Khởi tạo theme dựa trên cài đặt cũ hoặc mặc định là Sáng (Light Theme)
+ * Khá»Ÿi táº¡o theme dá»±a trÃªn cÃ i Ä‘áº·t cÅ© hoáº·c máº·c Ä‘á»‹nh lÃ  SÃ¡ng (Light Theme)
  */
 const initTheme = () => {
   const savedTheme = localStorage.getItem('theme');
@@ -106,11 +107,11 @@ const initTheme = () => {
 };
 
 /**
- * Cập nhật SVG icon của nút chuyển đổi Theme
+ * Cáº­p nháº­t SVG icon cá»§a nÃºt chuyá»ƒn Ä‘á»•i Theme
  */
 const updateThemeIcon = (isDark) => {
   if (isDark) {
-    // Hiển thị Sun Icon (để bấm chuyển sang Light)
+    // Hiá»ƒn thá»‹ Sun Icon (Ä‘á»ƒ báº¥m chuyá»ƒn sang Light)
     dom.themeIcon.innerHTML = `
       <circle cx="12" cy="12" r="5"></circle>
       <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -122,31 +123,31 @@ const updateThemeIcon = (isDark) => {
       <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
       <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
     `;
-    dom.btnThemeToggle.setAttribute('title', 'Chuyển sang chế độ Sáng');
+    dom.btnThemeToggle.setAttribute('title', 'Chuyá»ƒn sang cháº¿ Ä‘á»™ SÃ¡ng');
   } else {
-    // Hiển thị Moon Icon (để bấm chuyển sang Dark)
+    // Hiá»ƒn thá»‹ Moon Icon (Ä‘á»ƒ báº¥m chuyá»ƒn sang Dark)
     dom.themeIcon.innerHTML = `
       <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
     `;
-    dom.btnThemeToggle.setAttribute('title', 'Chuyển sang chế độ Tối');
+    dom.btnThemeToggle.setAttribute('title', 'Chuyá»ƒn sang cháº¿ Ä‘á»™ Tá»‘i');
   }
 };
 
 /**
- * Thực hiện đảo chế độ sáng/tối
+ * Thá»±c hiá»‡n Ä‘áº£o cháº¿ Ä‘á»™ sÃ¡ng/tá»‘i
  */
 const toggleTheme = () => {
   const isDark = document.body.classList.toggle('dark-theme');
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
   updateThemeIcon(isDark);
 
-  // Vẽ lại cổng logic nếu đang hiển thị để cập nhật màu sắc các mối nối
+  // Váº½ láº¡i cá»•ng logic náº¿u Ä‘ang hiá»ƒn thá»‹ Ä‘á»ƒ cáº­p nháº­t mÃ u sáº¯c cÃ¡c má»‘i ná»‘i
   if (currentResult) {
     renderLogicGates(currentResult);
   }
 };
 
-// ---- Parse dữ liệu đầu vào ------------------------------------
+// ---- Parse dá»¯ liá»‡u Ä‘áº§u vÃ o ------------------------------------
 
 const parseIntList = (str) => {
   const trimmed = str.trim();
@@ -156,31 +157,31 @@ const parseIntList = (str) => {
     .filter((s) => s !== '')
     .map((s) => {
       const n = parseInt(s, 10);
-      if (isNaN(n) || n < 0) throw new Error(`"${s}" không phải số nguyên hợp lệ`);
+      if (isNaN(n) || n < 0) throw new Error(`"${s}" khÃ´ng pháº£i sá»‘ nguyÃªn há»£p lá»‡`);
       return n;
     });
 };
 
 const validateInput = (minterms, dontCares) => {
   if (minterms.length === 0) {
-    throw new Error('Vui lòng nhập ít nhất 1 minterm.');
+    throw new Error('Vui lÃ²ng nháº­p Ã­t nháº¥t 1 minterm.');
   }
   const mintermSet = new Set(minterms);
   for (const d of dontCares) {
     if (mintermSet.has(d)) {
-      throw new Error(`Giá trị ${d} xuất hiện ở cả minterms và don't cares.`);
+      throw new Error(`GiÃ¡ trá»‹ ${d} xuáº¥t hiá»‡n á»Ÿ cáº£ minterms vÃ  don't cares.`);
     }
   }
   if (mintermSet.size !== minterms.length) {
-    throw new Error('Có giá trị trùng lặp trong phần minterms.');
+    throw new Error('CÃ³ giÃ¡ trá»‹ trÃ¹ng láº·p trong pháº§n minterms.');
   }
   const dcSet = new Set(dontCares);
   if (dcSet.size !== dontCares.length) {
-    throw new Error("Có giá trị trùng lặp trong phần don't cares.");
+    throw new Error("CÃ³ giÃ¡ trá»‹ trÃ¹ng láº·p trong pháº§n don't cares.");
   }
 };
 
-// ---- Hiển thị thông báo lỗi ---------------------------------
+// ---- Hiá»ƒn thá»‹ thÃ´ng bÃ¡o lá»—i ---------------------------------
 const showError = (msg) => {
   const textSpan = dom.errorMsg.querySelector('#error-text');
   if (textSpan) textSpan.textContent = msg;
@@ -192,18 +193,18 @@ const hideError = () => {
   dom.errorMsg.classList.remove('visible');
 };
 
-// ---- Các hàm hỗ trợ Render chung ----------------------------
+// ---- CÃ¡c hÃ m há»— trá»£ Render chung ----------------------------
 
 /**
- * Tạo cấu trúc HTML cho pattern nhị phân có phân biệt màu sắc 0, 1, X
- * HUST Standard: Hỗ trợ đóng khung chữ nhật bao quanh nếu là tích cực tiểu (EPI/PI)
+ * Táº¡o cáº¥u trÃºc HTML cho pattern nhá»‹ phÃ¢n cÃ³ phÃ¢n biá»‡t mÃ u sáº¯c 0, 1, X
+ * HUST Standard: Há»— trá»£ Ä‘Ã³ng khung chá»¯ nháº­t bao quanh náº¿u lÃ  tÃ­ch cá»±c tiá»ƒu (EPI/PI)
  */
 const renderPattern = (pattern, usedInMerge = false) => {
   let html = `<span class="pattern${!usedInMerge ? ' pattern-pi-framed' : ''}">`;
   for (const ch of pattern) {
     if (ch === '0') html += '<span class="bit-0">0</span>';
     else if (ch === '1') html += '<span class="bit-1">1</span>';
-    else html += '<span class="bit-dash">X</span>'; // Triệt tiêu biểu diễn bằng chữ X in hoa
+    else html += '<span class="bit-dash">X</span>'; // Triá»‡t tiÃªu biá»ƒu diá»…n báº±ng chá»¯ X in hoa
   }
   html += '</span>';
   return html;
@@ -214,7 +215,7 @@ const piColor = (idx, alpha = 1) => {
   return `rgba(${c.r}, ${c.g}, ${c.b}, ${alpha})`;
 };
 
-// ---- THÀNH PHẦN 1: BỘ CHỌN MINTERM LƯỚI SỐ TƯƠNG TÁC --------
+// ---- THÃ€NH PHáº¦N 1: Bá»˜ CHá»ŒN MINTERM LÆ¯á»šI Sá» TÆ¯Æ NG TÃC --------
 
 const renderMintermPicker = () => {
   const numVarsSelect = dom.inputNumVars.value;
@@ -337,42 +338,42 @@ const syncTextToPicker = () => {
   });
 };
 
-// ---- THÀNH PHẦN 2: TỔNG QUAN HÀM BOOLEAN KẾT QUẢ ------------
+// ---- THÃ€NH PHáº¦N 2: Tá»”NG QUAN HÃ€M BOOLEAN Káº¾T QUáº¢ ------------
 
-// ---- THÀNH PHẦN 2: TỔNG QUAN HÀM BOOLEAN KẾT QUẢ ------------
+// ---- THÃ€NH PHáº¦N 2: Tá»”NG QUAN HÃ€M BOOLEAN Káº¾T QUáº¢ ------------
 
 const renderSummary = (result, minterms, dontCares) => {
   const varNames = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.slice(0, result.numVars).split('').join(', ');
   const chips = []
   dom.summaryInfo.innerHTML = chips.map((c) => `<span class="info-chip">${c}</span>`).join('');
 
-  // Hiển thị Dạng tối thiểu R_min(F) [HUST Standard]
+  // Hiá»ƒn thá»‹ Dáº¡ng tá»‘i thiá»ƒu R_min(F) [HUST Standard]
   dom.expressionValue.innerHTML = `R<sub>min</sub>(F) = ${result.expression}`;
 
   const epiCount = result.essentialPIs.length;
   const additionalCount = result.selectedPIs.length - epiCount;
   let metaHTML = `<span class="expression-meta__item">
     <span class="expression-meta__dot expression-meta__dot--epi"></span>
-    ${epiCount} tích cực tiểu thiết yếu (EPI)
+    ${epiCount} tÃ­ch cá»±c tiá»ƒu thiáº¿t yáº¿u (EPI)
   </span>`;
   if (additionalCount > 0) {
     metaHTML += `<span class="expression-meta__item">
       <span class="expression-meta__dot expression-meta__dot--additional"></span>
-      ${additionalCount} tích cực tiểu bổ sung tối ưu
+      ${additionalCount} tÃ­ch cá»±c tiá»ƒu bá»• sung tá»‘i Æ°u
     </span>`;
   }
   dom.expressionMeta.innerHTML = metaHTML;
 };
 
-// ---- THÀNH PHẦN 3: ROUND TABS & MERGE (CROSS-HIGHLIGHT) -----
+// ---- THÃ€NH PHáº¦N 3: ROUND TABS & MERGE (CROSS-HIGHLIGHT) -----
 
 const renderRoundTabs = (rounds) => {
   dom.roundTabs.innerHTML = '';
   rounds.forEach((_, idx) => {
     const btn = document.createElement('button');
     btn.className = 'round-tab' + (idx === activeRoundIndex ? ' active' : '');
-    // Đặt tên tab là Khối K^idx chuẩn slide HUST
-    btn.innerHTML = idx === 0 ? 'Khối K<sup>0</sup> (Nhóm gốc)' : `Khối K<sup>${idx}</sup>`;
+    // Äáº·t tÃªn tab lÃ  Khá»‘i K^idx chuáº©n slide HUST
+    btn.innerHTML = idx === 0 ? 'Khá»‘i K<sup>0</sup> (NhÃ³m gá»‘c)' : `Khá»‘i K<sup>${idx}</sup>`;
     btn.addEventListener('click', () => {
       activeRoundIndex = idx;
       renderRoundTabs(rounds);
@@ -380,30 +381,30 @@ const renderRoundTabs = (rounds) => {
     });
     dom.roundTabs.appendChild(btn);
   });
-  dom.roundsCount.textContent = `${rounds.length} vòng`;
+  dom.roundsCount.textContent = `${rounds.length} vÃ²ng`;
 };
 
 const renderMergeTable = (round, roundIdx = 0) => {
-  dom.mergeThead.innerHTML = `<tr><th>Nhóm hàng</th><th>Pattern nhị phân</th><th>Tích chuẩn (Minterm)</th><th>Trạng thái</th></tr>`;
+  dom.mergeThead.innerHTML = `<tr><th>NhÃ³m hÃ ng</th><th>Pattern nhá»‹ phÃ¢n</th><th>TÃ­ch chuáº©n (Minterm)</th><th>Tráº¡ng thÃ¡i</th></tr>`;
 
   const groups = round.groups;
   const groupKeys = Object.keys(groups).map(Number).sort((a, b) => a - b);
   let html = '';
 
   for (const key of groupKeys) {
-    // Đổi tên nhóm phân theo số bit 1 thành nhóm K_key
-    html += `<tr class="group-header"><td colspan="4">Nhóm K<sub>${key}</sub> (${key} bit 1 — ${groups[key].length} tích cực tiểu)</td></tr>`;
+    // Äá»•i tÃªn nhÃ³m phÃ¢n theo sá»‘ bit 1 thÃ nh nhÃ³m K_key
+    html += `<tr class="group-header"><td colspan="4">NhÃ³m K<sub>${key}</sub> (${key} bit 1 â€” ${groups[key].length} tÃ­ch cá»±c tiá»ƒu)</td></tr>`;
     for (const imp of groups[key]) {
       // HUST Standard: 
-      // - Nếu đã được gộp (usedInMerge): render bình thường và chèn chữ V in hoa màu lục bên phải pattern!
-      // - Nếu chưa được gộp (tích cực tiểu): bao pattern trong khung chữ nhật nét liền rực rỡ!
+      // - Náº¿u Ä‘Ã£ Ä‘Æ°á»£c gá»™p (usedInMerge): render bÃ¬nh thÆ°á»ng vÃ  chÃ¨n chá»¯ V in hoa mÃ u lá»¥c bÃªn pháº£i pattern!
+      // - Náº¿u chÆ°a Ä‘Æ°á»£c gá»™p (tÃ­ch cá»±c tiá»ƒu): bao pattern trong khung chá»¯ nháº­t nÃ©t liá»n rá»±c rá»¡!
       const statusBadge = imp.usedInMerge
-        ? '<span class="status-badge status-badge--merged">✓ Đã gộp</span>'
-        : '<span class="status-badge status-badge--pi">★ Tích cực tiểu</span>';
+        ? '<span class="status-badge status-badge--merged">âœ“ ÄÃ£ gá»™p</span>'
+        : '<span class="status-badge status-badge--pi">â˜… TÃ­ch cá»±c tiá»ƒu</span>';
 
       const isClickable = roundIdx > 0 ? ' class="clickable-row"' : '';
       const checkMarkText = imp.usedInMerge
-        ? '<span style="color:var(--accent-emerald); font-weight:900; margin-left: 8px;" title="Đã gộp nhóm (merged)">V</span>'
+        ? '<span style="color:var(--accent-emerald); font-weight:900; margin-left: 8px;" title="ÄÃ£ gá»™p nhÃ³m (merged)">V</span>'
         : '';
 
       html += `<tr${isClickable} data-pattern="${imp.pattern}" data-minterms="${imp.minterms.join(',')}">
@@ -461,10 +462,10 @@ const setupCrossMergeHighlight = (roundIdx) => {
   });
 };
 
-// ---- THÀNH PHẦN 4: HIỂN THỊ CÁC tích cực tiểu DƯỚI DẠNG CHIPS -
+// ---- THÃ€NH PHáº¦N 4: HIá»‚N THá»Š CÃC tÃ­ch cá»±c tiá»ƒu DÆ¯á»šI Dáº NG CHIPS -
 
 const renderPIList = (result) => {
-  dom.piCount.textContent = `${result.primeImplicants.length} tích cực tiểu`;
+  dom.piCount.textContent = `${result.primeImplicants.length} tÃ­ch cá»±c tiá»ƒu`;
 
   const essentialPatterns = new Set(result.essentialPIs.map((pi) => pi.pattern));
   const selectedPatterns = new Set(result.selectedPIs.map((pi) => pi.pattern));
@@ -484,7 +485,7 @@ const renderPIList = (result) => {
         label = ' (EPI)';
       } else if (selectedPatterns.has(pi.pattern)) {
         cls += ' pi-chip--selected';
-        label = ' (chọn)';
+        label = ' (chá»n)';
       }
 
       if (pi.pattern in piColorIndex) {
@@ -492,7 +493,7 @@ const renderPIList = (result) => {
         colorDot = `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${piColor(idx)};margin-right:6px;vertical-align:middle;box-shadow:0 0 5px ${piColor(idx)}"></span>`;
       }
 
-      // Ở đâyPI hiển thị đóng khung chữ nhật đúng chuẩn slide HUST!
+      // á»ž Ä‘Ã¢yPI hiá»ƒn thá»‹ Ä‘Ã³ng khung chá»¯ nháº­t Ä‘Ãºng chuáº©n slide HUST!
       const patternFramedHTML = renderPattern(pi.pattern, false);
 
       return `<span class="${cls}" data-pattern="${pi.pattern}" title="Minterms: {${pi.minterms.join(', ')}}">${colorDot}${patternFramedHTML}${label}</span>`;
@@ -522,7 +523,7 @@ const setupPIChipHover = () => {
   });
 };
 
-// ---- THÀNH PHẦN 5: BẢNG BAO PHỦ TƯƠNG TÁC (COVERAGE CHART) --
+// ---- THÃ€NH PHáº¦N 5: Báº¢NG BAO PHá»¦ TÆ¯Æ NG TÃC (COVERAGE CHART) --
 
 const renderPIChart = (result) => {
   const allChartMinterms = new Set();
@@ -534,7 +535,7 @@ const renderPIChart = (result) => {
   const essentialPatterns = new Set(result.essentialPIs.map((pi) => pi.pattern));
   const selectedPatterns = new Set(result.selectedPIs.map((pi) => pi.pattern));
 
-  // TÍNH TOÁN ĐỘ PHỦ TỪNG CỘT ĐỂ VẼ DẤU Ⓧ THIẾT YẾU KHOANH TRÒN
+  // TÃNH TOÃN Äá»˜ PHá»¦ Tá»ªNG Cá»˜T Äá»‚ Váº¼ Dáº¤U â“ THIáº¾T Yáº¾U KHOANH TRÃ’N
   const mintermCoverageCount = {};
   sortedMinterms.forEach((m) => {
     let count = 0;
@@ -544,8 +545,8 @@ const renderPIChart = (result) => {
     mintermCoverageCount[m] = count;
   });
 
-  // Bảng bao phủ tiêu đề
-  let theadHTML = '<tr><th>tích cực tiểu \\ Minterm</th>';
+  // Báº£ng bao phá»§ tiÃªu Ä‘á»
+  let theadHTML = '<tr><th>tÃ­ch cá»±c tiá»ƒu \\ Minterm</th>';
   sortedMinterms.forEach((m, colIdx) => {
     theadHTML += `<th data-col="${colIdx}" data-minterm="${m}">${m}</th>`;
   });
@@ -566,17 +567,17 @@ const renderPIChart = (result) => {
     else if (isSelected) tag = ' <span class="status-badge status-badge--merged" style="font-size:0.6rem">SEL</span>';
 
     tbodyHTML += `<tr class="${rowClass}" data-row="${rowIdx}" data-pattern="${pattern}">`;
-    tbodyHTML += `<td>${renderPattern(pattern, false)}${tag}</td>`; // PI trong chart cũng được đóng khung
+    tbodyHTML += `<td>${renderPattern(pattern, false)}${tag}</td>`; // PI trong chart cÅ©ng Ä‘Æ°á»£c Ä‘Ã³ng khung
 
     sortedMinterms.forEach((m, colIdx) => {
       if (covered.has(m)) {
         // HUST Standard: 
-        // - Cột chỉ có duy nhất 1 dấu phủ: Vẽ chữ Ⓧ (X khoanh tròn) rực rỡ!
-        // - Cột có nhiều hơn 1 dấu phủ: Vẽ chữ X in hoa thông thường!
+        // - Cá»™t chá»‰ cÃ³ duy nháº¥t 1 dáº¥u phá»§: Váº½ chá»¯ â“ (X khoanh trÃ²n) rá»±c rá»¡!
+        // - Cá»™t cÃ³ nhiá»u hÆ¡n 1 dáº¥u phá»§: Váº½ chá»¯ X in hoa thÃ´ng thÆ°á»ng!
         if (mintermCoverageCount[m] === 1) {
-          tbodyHTML += `<td data-col="${colIdx}"><span class="chart-cell-x chart-cell-x--essential" title="Điểm phủ quyết định thiết yếu (EPI)">Ⓧ</span></td>`;
+          tbodyHTML += `<td data-col="${colIdx}"><span class="chart-cell-x chart-cell-x--essential" title="Äiá»ƒm phá»§ quyáº¿t Ä‘á»‹nh thiáº¿t yáº¿u (EPI)">â“</span></td>`;
         } else {
-          tbodyHTML += `<td data-col="${colIdx}"><span class="chart-cell-x" title="Điểm phủ thường">X</span></td>`;
+          tbodyHTML += `<td data-col="${colIdx}"><span class="chart-cell-x" title="Äiá»ƒm phá»§ thÆ°á»ng">X</span></td>`;
         }
       } else {
         tbodyHTML += `<td data-col="${colIdx}"></td>`;
@@ -636,7 +637,7 @@ const setupChartHover = () => {
   });
 };
 
-// ---- THÀNH PHẦN 6: tích cực tiểu ĐÃ CHỌN TỐI ƯU ------------------
+// ---- THÃ€NH PHáº¦N 6: tÃ­ch cá»±c tiá»ƒu ÄÃƒ CHá»ŒN Tá»I Æ¯U ------------------
 
 const renderSelectedPIs = (result) => {
   const essentialPatterns = new Set(result.essentialPIs.map((pi) => pi.pattern));
@@ -651,18 +652,18 @@ const renderSelectedPIs = (result) => {
     const isEpi = essentialPatterns.has(pi.pattern);
     const chipClass = isEpi ? 'pi-chip pi-chip--essential' : 'pi-chip pi-chip--selected';
     const patternFramed = renderPattern(pi.pattern, false);
-    return `<span class="${chipClass}" data-pattern="${pi.pattern}" title="= ${term}, bao phủ {${pi.minterms.join(', ')}}">${dot}${patternFramed} → ${term}</span>`;
+    return `<span class="${chipClass}" data-pattern="${pi.pattern}" title="= ${term}, bao phá»§ {${pi.minterms.join(', ')}}">${dot}${patternFramed} â†’ ${term}</span>`;
   };
 
   if (result.essentialPIs.length === 0) {
-    dom.essentialPiList.innerHTML = '<span class="info-chip" style="color:var(--text-muted)">Không có tích cực tiểu thiết yếu</span>';
+    dom.essentialPiList.innerHTML = '<span class="info-chip" style="color:var(--text-muted)">KhÃ´ng cÃ³ tÃ­ch cá»±c tiá»ƒu thiáº¿t yáº¿u</span>';
   } else {
     dom.essentialPiList.innerHTML = result.essentialPIs.map(createPiHTML).join('');
   }
 
   const additionalPIs = result.selectedPIs.filter((pi) => !essentialPatterns.has(pi.pattern));
   if (additionalPIs.length === 0) {
-    dom.additionalPiList.innerHTML = '<span class="info-chip" style="color:var(--text-muted)">Không cần chọn thêm tích cực tiểu bổ sung</span>';
+    dom.additionalPiList.innerHTML = '<span class="info-chip" style="color:var(--text-muted)">KhÃ´ng cáº§n chá»n thÃªm tÃ­ch cá»±c tiá»ƒu bá»• sung</span>';
   } else {
     dom.additionalPiList.innerHTML = additionalPIs.map(createPiHTML).join('');
   }
@@ -686,7 +687,7 @@ const renderSelectedPIs = (result) => {
   });
 };
 
-// ---- THÀNH PHẦN 7: BẢN ĐỒ KARNAUGH VÀ SVG LOOP OVERLAY ------
+// ---- THÃ€NH PHáº¦N 7: Báº¢N Äá»’ KARNAUGH VÃ€ SVG LOOP OVERLAY ------
 
 const getKmapLayout = (numVars) => {
   if (numVars === 2) return { rows: GRAY_1, cols: GRAY_1, rowVars: 'A', colVars: 'B' };
@@ -712,7 +713,7 @@ const renderKmap = (result, minterms, dontCares) => {
   }
 
   dom.kmapCard.classList.remove('hidden');
-  dom.kmapVarsBadge.textContent = `${numVars} biến`;
+  dom.kmapVarsBadge.textContent = `${numVars} biáº¿n`;
 
   const mintermSet = new Set(minterms);
   const dcSet = new Set(dontCares);
@@ -804,7 +805,7 @@ const applyKmapGroupColors = (result) => {
 const renderKmapLegend = (result) => {
   if (!result || !result.selectedPIs) return;
 
-  let html = '<span class="kmap-legend-label">Chú thích các tích cực tiểu:</span>';
+  let html = '<span class="kmap-legend-label">ChÃº thÃ­ch cÃ¡c tÃ­ch cá»±c tiá»ƒu:</span>';
 
   result.selectedPIs.forEach((pi, idx) => {
     const term = patternToTerm(pi.pattern, result.numVars);
@@ -1027,7 +1028,7 @@ const clearKmapHighlight = () => {
   dom.kmapSvgOverlay.innerHTML = '';
 };
 
-// ---- THÀNH PHẦN 8: SƠ ĐỒ CỔNG LOGIC TỰ ĐỘNG SINH BẰNG SVG ----
+// ---- THÃ€NH PHáº¦N 8: SÆ  Äá»’ Cá»”NG LOGIC Tá»° Äá»˜NG SINH Báº°NG SVG ----
 
 const renderLogicGates = (result) => {
   if (!result || result.expression === '0') {
@@ -1043,7 +1044,7 @@ const renderLogicGates = (result) => {
 
   if (result.expression === '1') {
     dom.logicSvgWrapper.innerHTML = `<svg width="250" height="80">
-      <text x="30" y="45" class="gate-text" style="font-size:14px">Đầu vào R_min(F) luôn bằng logic 1:</text>
+      <text x="30" y="45" class="gate-text" style="font-size:14px">Äáº§u vÃ o R_min(F) luÃ´n báº±ng logic 1:</text>
       <rect x="250" y="25" width="40" height="30" rx="4" class="gate-shape" style="stroke:var(--accent-emerald)"></rect>
       <text x="265" y="45" class="gate-text" style="fill:var(--accent-emerald); font-weight:800">1</text>
       <line x1="290" y1="40" x2="330" y2="40" stroke="var(--accent-emerald)" stroke-width="2.5"></line>
@@ -1101,7 +1102,7 @@ const renderLogicGates = (result) => {
     const term = patternToTerm(pi.pattern, numVars);
     const color = piColor(idx);
 
-    svgHTML += `<!-- Cổng AND #${idx} (${term}) -->`;
+    svgHTML += `<!-- Cá»•ng AND #${idx} (${term}) -->`;
 
     let inputCount = 0;
     const connections = [];
@@ -1318,7 +1319,7 @@ const renderNANDGates = (result) => {
     const term = patternToTerm(pi.pattern, numVars);
     const color = piColor(idx);
 
-    svgHTML += `<!-- Cổng NAND #${idx} (${term}) -->`;
+    svgHTML += `<!-- Cá»•ng NAND #${idx} (${term}) -->`;
 
     let inputCount = 0;
     const connections = [];
@@ -1441,7 +1442,7 @@ const renderNORGates = (result) => {
     const term = patternToTerm(pi.pattern, numVars);
     const color = piColor(idx);
 
-    svgHTML += `<!-- Cổng NOR #${idx} (${term}) -->`;
+    svgHTML += `<!-- Cá»•ng NOR #${idx} (${term}) -->`;
 
     let inputCount = 0;
     const connections = [];
@@ -1511,22 +1512,22 @@ const renderNORGates = (result) => {
   dom.logicNorSvgWrapper.innerHTML = svgHTML;
 };
 
-// ---- THÀNH PHẦN 9: ĐIỀU KHIỂN XEM TỪNG BƯỚC (STEPPER) -------
+// ---- THÃ€NH PHáº¦N 9: ÄIá»€U KHIá»‚N XEM Tá»ªNG BÆ¯á»šC (STEPPER) -------
 
 const buildSteps = (result) => {
   const s = [];
-  s.push({ label: 'Tổng quan', cardId: 'summary-card', icon: '📊' });
-  s.push({ label: 'Quá trình Merge', cardId: 'rounds-card', icon: '🔄' });
-  s.push({ label: 'Các tích cực tiểu', cardId: 'pi-card', icon: '⭐' });
-  s.push({ label: 'Bảng bao phủ', cardId: 'chart-card', icon: '📋' });
-  s.push({ label: 'Các tích cực tiểu đã chọn', cardId: 'selected-card', icon: '✅' });
+  s.push({ label: 'Tá»•ng quan', cardId: 'summary-card', icon: 'ðŸ“Š' });
+  s.push({ label: 'QuÃ¡ trÃ¬nh Merge', cardId: 'rounds-card', icon: 'ðŸ”„' });
+  s.push({ label: 'CÃ¡c tÃ­ch cá»±c tiá»ƒu', cardId: 'pi-card', icon: 'â­' });
+  s.push({ label: 'Báº£ng bao phá»§', cardId: 'chart-card', icon: 'ðŸ“‹' });
+  s.push({ label: 'CÃ¡c tÃ­ch cá»±c tiá»ƒu Ä‘Ã£ chá»n', cardId: 'selected-card', icon: 'âœ…' });
 
   if (result.numVars >= 2 && result.numVars <= 4) {
-    s.push({ label: 'Karnaugh Map', cardId: 'kmap-card', icon: '🗺️' });
+    s.push({ label: 'Karnaugh Map', cardId: 'kmap-card', icon: 'ðŸ—ºï¸' });
   }
 
   if (result.expression !== '0') {
-    s.push({ label: 'Sơ đồ Cổng Logic', cardId: 'logic-card', icon: '🔌' });
+    s.push({ label: 'SÆ¡ Ä‘á»“ Cá»•ng Logic', cardId: 'logic-card', icon: 'ðŸ”Œ' });
   }
 
   return s;
@@ -1555,7 +1556,7 @@ const renderStepperProgress = () => {
   });
 
   const step = steps[currentStep];
-  dom.stepperLabel.innerHTML = `<strong>${step.icon} ${step.label}</strong> — Bước ${currentStep + 1} / ${steps.length}`;
+  dom.stepperLabel.innerHTML = `<strong>${step.icon} ${step.label}</strong> â€” BÆ°á»›c ${currentStep + 1} / ${steps.length}`;
 
   dom.btnPrev.disabled = currentStep === 0;
   dom.btnNext.disabled = currentStep === steps.length - 1;
@@ -1579,26 +1580,27 @@ const goToStep = (idx) => {
   }
 
   renderStepperProgress();
+  if (typeof updateCodeTrace === 'function') updateCodeTrace(currentStep);
 };
 
 const toggleStepperMode = () => {
   stepperMode = !stepperMode;
 
   if (stepperMode) {
-    dom.btnToggleMode.textContent = '📋 Xem tất cả';
+    dom.btnToggleMode.textContent = 'ðŸ“‹ Xem táº¥t cáº£';
     dom.btnToggleMode.classList.add('active');
     dom.stepperControls.classList.remove('hidden');
 
     currentStep = 0;
     goToStep(0);
   } else {
-    dom.btnToggleMode.textContent = '📖 Xem từng bước';
+    dom.btnToggleMode.textContent = 'ðŸ“– Xem tá»«ng bÆ°á»›c';
     dom.btnToggleMode.classList.remove('active');
     dom.stepperControls.classList.add('hidden');
 
     const allCards = dom.resultsSection.querySelectorAll('.result-card');
     allCards.forEach((card) => {
-      card.classList.remove('step-hidden', 'step-enter');
+      card.classList.remove('step-hidden', 'hidden', 'step-enter');
     });
 
     if (currentResult) {
@@ -1607,10 +1609,12 @@ const toggleStepperMode = () => {
       }
       dom.logicCard.classList.remove('hidden');
     }
+
+    if (typeof updateCodeTrace === 'function') updateCodeTrace(steps.length - 1);
   }
 };
 
-// ---- CHUYỂN ĐỔI TAB TỰ ĐỘNG CHO CỘT TRÁI VÀ CỘT PHẢI --------
+// ---- CHUYá»‚N Äá»”I TAB Tá»° Äá»˜NG CHO Cá»˜T TRÃI VÃ€ Cá»˜T PHáº¢I --------
 
 const initLeftTabs = () => {
   const container = document.getElementById('left-tabs-container');
@@ -1660,7 +1664,7 @@ const initVisTabs = () => {
   });
 };
 
-// ---- TRÌNH CHẠY THUẬT TOÁN CHÍNH (MAIN ENTRY POINT) --------
+// ---- TRÃŒNH CHáº Y THUáº¬T TOÃN CHÃNH (MAIN ENTRY POINT) --------
 
 const runAlgorithm = () => {
   hideError();
@@ -1678,7 +1682,7 @@ const runAlgorithm = () => {
       const allTerms = [...minterms, ...dontCares];
       for (const t of allTerms) {
         if (t > maxVal) {
-          throw new Error(`Giá trị ${t} vượt quá giới hạn ${maxVal} của ${numVarsOverride} biến.`);
+          throw new Error(`GiÃ¡ trá»‹ ${t} vÆ°á»£t quÃ¡ giá»›i háº¡n ${maxVal} cá»§a ${numVarsOverride} biáº¿n.`);
         }
       }
     }
@@ -1700,13 +1704,13 @@ const runAlgorithm = () => {
     renderKmap(result, minterms, dontCares);
     renderLogicGates(result);
 
-    // Biến đổi De Morgan và dựng sơ đồ NAND/NOR
+    // Biáº¿n Ä‘á»•i De Morgan vÃ  dá»±ng sÆ¡ Ä‘á»“ NAND/NOR
     dom.demorganNandBox.innerHTML = generateDeMorganNAND(result.selectedPIs, result.numVars);
     dom.demorganNorBox.innerHTML = generateDeMorganNOR(result.selectedPIs, result.numVars);
     renderNANDGates(result);
     renderNORGates(result);
 
-    // Khôi phục Tabs về mặc định khi bắt đầu chạy mới
+    // KhÃ´i phá»¥c Tabs vá» máº·c Ä‘á»‹nh khi báº¯t Ä‘áº§u cháº¡y má»›i
     const leftTabContainer = document.getElementById('left-tabs-container');
     if (leftTabContainer) {
       leftTabContainer.querySelector('.left-tab.active')?.classList.remove('active');
@@ -1741,6 +1745,9 @@ const runAlgorithm = () => {
       currentStep = 0;
       goToStep(0);
       renderStepperProgress();
+    } else {
+        if (dom.codeTracePanel) dom.codeTracePanel.classList.remove('hidden');
+        if (typeof updateCodeTrace === 'function') updateCodeTrace(steps.length - 1);
     }
 
     dom.resultsSection.classList.remove('hidden');
@@ -1755,17 +1762,18 @@ const runAlgorithm = () => {
   }
 };
 
-// ---- XÓA SẠCH DỮ LIỆU (CLEAR ALL) --------------------------
+// ---- XÃ“A Sáº CH Dá»® LIá»†U (CLEAR ALL) --------------------------
 
 const clearAll = () => {
   dom.inputMinterms.value = '';
   dom.inputDontCares.value = '';
   dom.inputNumVars.value = 'auto';
-  hideError();
   dom.resultsSection.classList.add('hidden');
+  if (dom.codeTracePanel) dom.codeTracePanel.classList.add('hidden');
+  hideError();
   dom.stepperControls.classList.add('hidden');
   dom.btnToggleMode.classList.remove('active');
-  dom.btnToggleMode.textContent = '📖 Xem từng bước';
+  dom.btnToggleMode.textContent = 'ðŸ“– Xem tá»«ng bÆ°á»›c';
 
   currentResult = null;
   stepperMode = false;
@@ -1780,7 +1788,7 @@ const clearAll = () => {
   renderMintermPicker();
 };
 
-// ---- NẠP CÁC VÍ DỤ MẪU (PRESETS) --------------------------
+// ---- Náº P CÃC VÃ Dá»¤ MáºªU (PRESETS) --------------------------
 
 const examples = {
   1: { minterms: '0, 1, 2, 5, 6, 7', dontCares: '', numVars: '3' },
@@ -1803,7 +1811,7 @@ const loadExample = (id) => {
   setTimeout(() => { dom.inputMinterms.style.borderColor = ''; }, 600);
 };
 
-// ---- GẮN SỰ KIỆN LẮNG NGHE (EVENT LISTENERS) ----------------
+// ---- Gáº®N Sá»° KIá»†N Láº®NG NGHE (EVENT LISTENERS) ----------------
 
 dom.btnRun.addEventListener('click', runAlgorithm);
 dom.btnClear.addEventListener('click', clearAll);
@@ -1842,7 +1850,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// ---- THÀNH PHẦN: ĐIỀU HƯỚNG LANDING PAGE ↔ WORKSPACE --------
+// ---- THÃ€NH PHáº¦N: ÄIá»€U HÆ¯á»šNG LANDING PAGE â†” WORKSPACE --------
 
 const landingPage = document.getElementById('landing-page');
 const workspacePage = document.getElementById('workspace-page');
@@ -1851,7 +1859,7 @@ const breadcrumbText = document.getElementById('breadcrumb-text');
 const btnGoHome = document.getElementById('btn-go-home');
 
 /**
- * Hiển thị Landing Page, ẩn Workspace
+ * Hiá»ƒn thá»‹ Landing Page, áº©n Workspace
  */
 const showLanding = () => {
   landingPage.classList.remove('hidden');
@@ -1861,19 +1869,19 @@ const showLanding = () => {
 };
 
 /**
- * Hiển thị Workspace, ẩn Landing
- * @param {string} cardTitle   - Tên chức năng hiển thị trên breadcrumb
- * @param {string|null} tabId  - ID của vis-tab cần kích hoạt (nếu có)
+ * Hiá»ƒn thá»‹ Workspace, áº©n Landing
+ * @param {string} cardTitle   - TÃªn chá»©c nÄƒng hiá»ƒn thá»‹ trÃªn breadcrumb
+ * @param {string|null} tabId  - ID cá»§a vis-tab cáº§n kÃ­ch hoáº¡t (náº¿u cÃ³)
  */
 const showWorkspace = (cardTitle, tabId = null) => {
   landingPage.classList.add('hidden');
   workspacePage.classList.remove('hidden');
   navBreadcrumb.classList.remove('hidden');
   breadcrumbText.textContent = cardTitle;
-  // Chỉ lock scroll trên desktop (dashboard fixed viewport)
+  // Chá»‰ lock scroll trÃªn desktop (dashboard fixed viewport)
   document.body.style.overflow = window.innerWidth >= 1024 ? 'hidden' : 'auto';
 
-  // Chuyển sang đúng tab visualisation nếu được chỉ định
+  // Chuyá»ƒn sang Ä‘Ãºng tab visualisation náº¿u Ä‘Æ°á»£c chá»‰ Ä‘á»‹nh
   if (tabId) {
     const allVisTabs = document.querySelectorAll('.vis-tab');
     const allVisContent = document.querySelectorAll('.vis-content');
@@ -1888,16 +1896,16 @@ const showWorkspace = (cardTitle, tabId = null) => {
 };
 
 /**
- * Khởi tạo sự kiện click cho toàn bộ cards trên Landing Page
+ * Khá»Ÿi táº¡o sá»± kiá»‡n click cho toÃ n bá»™ cards trÃªn Landing Page
  */
 const initLandingCards = () => {
   const cards = document.querySelectorAll('.landing__card');
 
   const cardMeta = {
-    'kmap-card': 'Bìa Karnaugh (K-map)',
-    'logic-card': 'Mạch AND-OR',
-    'nand-card': 'Mạch NAND-only',
-    'nor-card': 'Mạch NOR-only',
+    'kmap-card': 'BÃ¬a Karnaugh (K-map)',
+    'logic-card': 'Máº¡ch AND-OR',
+    'nand-card': 'Máº¡ch NAND-only',
+    'nor-card': 'Máº¡ch NOR-only',
   };
 
   cards.forEach(card => {
@@ -1911,7 +1919,7 @@ const initLandingCards = () => {
 };
 
 /**
- * Logo/Brand → quay về Landing
+ * Logo/Brand â†’ quay vá» Landing
  */
 if (btnGoHome) {
   btnGoHome.addEventListener('click', (e) => {
@@ -1926,6 +1934,70 @@ window.addEventListener('DOMContentLoaded', () => {
   initLeftTabs();
   initVisTabs();
   initLandingCards();
-  showLanding(); // Bắt đầu ở Landing page
+  showLanding(); // Báº¯t Ä‘áº§u á»Ÿ Landing page
 });
 
+
+// ---- Code Trace Panel -----------------------------------------
+const STEP_LINE_MAP = {
+  0: [1],
+  1: [2],
+  2: [3, 4, 5, 6, 7, 8, 9],
+  3: [10],
+  4: [11],
+  5: [12],
+  6: [13],
+};
+
+const updateCodeTrace = (stepIdx) => {
+  if (!dom.codeTracePanel) return;
+  if (!stepperMode) {
+    document.querySelectorAll('.code-line').forEach(el => {
+      el.classList.remove('active');
+      el.classList.add('done');
+    });
+    const lastLine = document.querySelector('.code-line[data-line="13"]');
+    if (lastLine) {
+      lastLine.classList.remove('done');
+      lastLine.classList.add('active');
+    }
+    const inspector = document.getElementById('state-inspector');
+    if (inspector) inspector.textContent = 'Hoàn thành tính toán!';
+    return;
+  }
+
+  document.querySelectorAll('.code-line').forEach(el => {
+    el.classList.remove('active', 'done');
+  });
+
+  const targetLines = STEP_LINE_MAP[stepIdx] || [];
+  
+  for (let i = 0; i < stepIdx; i++) {
+    const prevLines = STEP_LINE_MAP[i] || [];
+    prevLines.forEach(lNum => {
+      const el = document.querySelector('.code-line[data-line="' + lNum + '"]');
+      if (el) el.classList.add('done');
+    });
+  }
+
+  targetLines.forEach(lNum => {
+    const el = document.querySelector('.code-line[data-line="' + lNum + '"]');
+    if (el) el.classList.add('active');
+  });
+
+  const inspector = document.getElementById('state-inspector');
+  if (inspector && currentResult) {
+    let msg = '';
+    switch (stepIdx) {
+      case 0: msg = 'Kh?i t?o: phân tích minterms và don''t cares -> chu?i nh? phân.'; break;
+      case 1: msg = 'Ðang phân chia các implicant thành nhóm theo s? lu?ng bit ''1''.'; break;
+      case 2: msg = 'Th?c hi?n g?p các nhóm lân c?n...'; break;
+      case 3: msg = 'L?p PI Chart ph? các minterms.'; break;
+      case 4: msg = 'Tìm các Essential PIs.'; break;
+      case 5: msg = 'S? d?ng phuong pháp Petrick cho các minterms còn l?i.'; break;
+      case 6: msg = 'T?ng h?p R_min(F) = ' + currentResult.expression; break;
+      default: msg = 'Ðang x? lý...';
+    }
+    inspector.textContent = msg;
+  }
+};
